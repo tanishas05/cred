@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CredUPI — Credit for Every Shopkeeper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --sf:#FF6B2B;--sf-l:#FFF0E8;--sf-m:#FFD4BC;--sf-d:#C94A14;
+  --in:#1A237E;--in-l:#E8EAF6;--in-m:#5C6BC0;
+  --tl:#00897B;--tl-l:#E0F2F1;--tl-m:#4DB6AC;
+  --gd:#F9A825;--gd-l:#FFF8E1;
+  --bg:#F5F2ED;--card:#FFFFFF;--tx:#1C1C1E;--mu:#6B6B6B;--br:#E2DDD5;
+  --er:#E53935;
+}
+html,body{min-height:100vh;background:#C8C2B8;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;padding:20px 0}
+.device{width:390px;min-height:844px;background:var(--bg);border-radius:48px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.35),0 0 0 1px rgba(0,0,0,0.15);position:relative;display:flex;flex-direction:column}
+.screen{display:none;flex-direction:column;min-height:844px}
+.screen.active{display:flex;animation:sIn .28s cubic-bezier(.22,1,.36,1)}
+@keyframes sIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)}}
+.sb{display:flex;justify-content:space-between;align-items:center;padding:14px 28px 6px;flex-shrink:0;font-size:13px;font-weight:600;color:var(--tx)}
+.nb{display:flex;align-items:center;justify-content:space-between;padding:6px 20px 12px;flex-shrink:0}
+.nt{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--tx)}
+.bk{width:36px;height:36px;border-radius:50%;background:var(--card);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;transition:background .15s}
+.bk:hover{background:var(--br)}
+.av{width:34px;height:34px;background:var(--sf);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0}
+.ct{flex:1;padding:0 20px 96px;overflow-y:auto}
+.ct::-webkit-scrollbar{display:none}
+.bn{position:absolute;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);backdrop-filter:blur(20px);border-top:.5px solid var(--br);display:flex;justify-content:space-around;padding:10px 0 28px;z-index:50}
+.ni{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;opacity:.32;transition:opacity .2s;padding:4px 14px}
+.ni.on{opacity:1}
+.ni svg{width:22px;height:22px}
+.ni>span{font-size:10px;font-weight:500;color:var(--mu)}
+.ni.on>span{color:var(--sf)}
+.ni svg path,.ni svg circle,.ni svg rect,.ni svg line,.ni svg polyline{stroke:var(--mu);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ni.on svg path,.ni.on svg circle,.ni.on svg rect,.ni.on svg line,.ni.on svg polyline{stroke:var(--sf)}
+
+/* form elements */
+.il{font-size:11px;font-weight:600;color:var(--mu);margin-bottom:6px;letter-spacing:.07em;text-transform:uppercase;display:block}
+.if{width:100%;padding:14px 16px;background:var(--card);border:1.5px solid var(--br);border-radius:14px;font-size:15px;font-family:'DM Sans',sans-serif;color:var(--tx);outline:none;transition:border-color .2s;appearance:none}
+.if:focus{border-color:var(--sf)}
+.pb{width:100%;padding:16px;background:var(--sf);color:#fff;border:none;border-radius:16px;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:transform .12s,background .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.pb:hover{background:var(--sf-d)}
+.pb:active{transform:scale(.97)}
+.pb:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.sb2{width:100%;padding:15px;background:transparent;color:var(--tx);border:1.5px solid var(--br);border-radius:16px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;margin-top:10px;transition:background .15s}
+.sb2:hover{background:var(--card)}
+.dv{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--mu);font-size:12px}
+.dv::before,.dv::after{content:'';flex:1;height:1px;background:var(--br)}
+.sec{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--tx);margin-bottom:12px}
+
+/* S1 */
+.lp{display:inline-flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--br);border-radius:100px;padding:8px 18px 8px 10px;margin-bottom:28px}
+.lm{width:34px;height:34px;background:var(--sf);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff}
+.ln{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--tx)}
+.ht{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;color:var(--tx);line-height:1.1;margin-bottom:12px}
+.ht em{color:var(--sf);font-style:normal}
+.hs{font-size:14px;color:var(--mu);line-height:1.6;margin-bottom:28px}
+.ss{display:flex;gap:10px;margin-bottom:28px}
+.sp{flex:1;background:var(--card);border:1px solid var(--br);border-radius:14px;padding:12px;text-align:center}
+.sv{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--sf)}
+.sl{font-size:10px;color:var(--mu);margin-top:2px}
+.tr{display:flex;justify-content:center;gap:18px;padding:20px 0 0}
+.tb{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--mu)}
+.td{width:5px;height:5px;border-radius:50%;background:var(--tl)}
+
+/* S2 */
+.ch{background:var(--in);border-radius:20px;padding:22px;margin-bottom:20px;color:#fff;position:relative;overflow:hidden}
+.ch::before{content:'';position:absolute;right:-40px;top:-40px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.05)}
+.cht{font-family:'Syne',sans-serif;font-size:21px;font-weight:700;margin-bottom:7px}
+.chs{font-size:13px;opacity:.8;line-height:1.5}
+.cbg{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);border-radius:100px;padding:5px 12px;font-size:11px;margin-top:12px}
+.ug{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.uc{background:var(--card);border:1.5px solid var(--br);border-radius:14px;padding:14px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color .2s,background .2s}
+.uc:hover{border-color:var(--sf-m);background:var(--sf-l)}
+.uc.sel{border-color:var(--sf);background:var(--sf-l)}
+.ui{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.un{font-weight:500;font-size:13px;color:var(--tx)}
+.uu{font-size:10px;color:var(--mu)}
+.pb2{background:var(--in-l);border-radius:14px;padding:16px;margin-bottom:18px}
+.pb2t{font-size:12px;font-weight:700;color:var(--in);margin-bottom:9px;text-transform:uppercase;letter-spacing:.06em}
+.pr{display:flex;align-items:center;gap:9px;margin-bottom:7px;font-size:12px;color:var(--in)}
+.pc{width:18px;height:18px;border-radius:50%;background:var(--tl);display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;flex-shrink:0;font-weight:700}
+.px{width:18px;height:18px;border-radius:50%;background:var(--br);display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:9px;flex-shrink:0}
+
+/* S3 dashboard */
+.sh{background:var(--in);border-radius:22px;padding:22px 20px;margin-bottom:18px;color:#fff;cursor:pointer;transition:transform .15s;position:relative;overflow:hidden}
+.sh::before{content:'';position:absolute;right:-50px;bottom:-50px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.04)}
+.sh:hover{transform:scale(.99)}
+.shl{font-size:11px;opacity:.65;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.sn{font-family:'Syne',sans-serif;font-size:62px;font-weight:800;line-height:1;color:var(--gd)}
+.stg{display:inline-block;background:rgba(249,168,37,.18);color:var(--gd);border-radius:100px;padding:3px 12px;font-size:11px;font-weight:600;margin:4px 0 12px;border:1px solid rgba(249,168,37,.3)}
+.sbb{height:5px;background:rgba(255,255,255,.15);border-radius:4px;overflow:hidden}
+.sbf{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--sf),var(--gd));transition:width 1s ease}
+.sr{display:flex;justify-content:space-between;font-size:10px;opacity:.5;margin-top:5px}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.sc{background:var(--card);border:1px solid var(--br);border-radius:16px;padding:13px 12px}
+.scl{font-size:10px;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.scv{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--tx);line-height:1.2}
+.scc{font-size:11px;color:var(--tl);margin-top:3px}
+.scc.lk{color:var(--sf);cursor:pointer}
+.cc{background:var(--card);border:1px solid var(--br);border-radius:16px;padding:16px;margin-bottom:18px}
+.tsh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.ta{font-size:12px;color:var(--sf);cursor:pointer;font-weight:500}
+.tl{display:flex;flex-direction:column;gap:8px}
+.ti{background:var(--card);border:1px solid var(--br);border-radius:14px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.tix{display:flex;align-items:center;gap:10px}
+.tav{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.tnm{font-size:14px;font-weight:500;color:var(--tx)}
+.ttm{font-size:11px;color:var(--mu)}
+.tam{font-family:'Syne',sans-serif;font-size:14px;font-weight:700}
+.tam.cr{color:var(--tl)}
+.tam.dr{color:var(--er)}
+
+/* S4 score */
+.gc{background:var(--card);border:1px solid var(--br);border-radius:22px;padding:24px 20px;margin-bottom:16px;text-align:center}
+.gw{width:200px;height:100px;margin:0 auto 10px;position:relative}
+.gt{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-family:'Syne',sans-serif;font-size:42px;font-weight:800;color:var(--sf);line-height:1}
+.sk{display:inline-block;background:var(--gd-l);color:#B8880A;border-radius:100px;padding:4px 16px;font-size:12px;font-weight:600;border:1px solid var(--gd);margin-bottom:8px}
+.sb3{font-size:12px;color:var(--mu)}
+.fl{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.fc{background:var(--card);border:1px solid var(--br);border-radius:14px;padding:14px}
+.ft{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.fn{font-size:13px;font-weight:500;color:var(--tx)}
+.fs{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--sf)}
+.fb{height:4px;background:var(--br);border-radius:2px;overflow:hidden}
+.ff{height:100%;border-radius:2px}
+.ab{width:100%;padding:15px;border:none;border-radius:16px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s}
+.ab:hover{opacity:.9}
+.bt{background:var(--tl);color:#fff}
+.bi{background:var(--in);color:#fff}
+
+/* S5 loans */
+.lh{background:linear-gradient(135deg,var(--sf),#FF9254);border-radius:22px;padding:22px 20px;color:#fff;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden}
+.lh::after{content:'';position:absolute;right:-20px;top:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.1)}
+.ll{font-size:11px;opacity:.85;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+.la{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;line-height:1}
+.ls{font-size:12px;opacity:.8;margin-top:3px}
+.lb{background:rgba(255,255,255,.25);border-radius:12px;padding:10px 14px;text-align:center;position:relative}
+.lbv{font-family:'Syne',sans-serif;font-size:18px;font-weight:800}
+.lbl{font-size:10px;opacity:.85}
+.ec{background:var(--in-l);border:1px solid var(--br);border-radius:16px;padding:16px;margin-bottom:18px}
+.el{font-size:11px;color:var(--in);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.ev{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--in)}
+.es{font-size:11px;color:var(--in-m);margin-top:2px}
+.ol{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.oc{background:var(--card);border:1.5px solid var(--br);border-radius:18px;padding:18px;position:relative;transition:transform .15s}
+.oc:hover{transform:translateY(-1px)}
+.oc.ft2{border-color:var(--sf)}
+.ftg{position:absolute;top:-1px;right:18px;background:var(--sf);color:#fff;font-size:10px;font-weight:700;padding:3px 12px;border-radius:0 0 10px 10px;letter-spacing:.05em;text-transform:uppercase}
+.oh{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.og{width:44px;height:44px;border-radius:12px;background:var(--in-l);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.on2{font-size:15px;font-weight:600;color:var(--tx)}
+.ot{font-size:11px;color:var(--mu)}
+.os{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:14px}
+.ost{background:var(--bg);border-radius:10px;padding:9px 6px;text-align:center}
+.ostl{font-size:9px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em}
+.ostv{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--tx);margin-top:2px}
+.apb{width:100%;padding:12px;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+.apb.og2{background:var(--sf);color:#fff}
+.apb.og2:hover{background:var(--sf-d)}
+.apb.id{background:var(--in);color:#fff}
+.apb.id:hover{background:var(--in-m)}
+
+/* S6 insights */
+.ih{background:var(--tl);border-radius:22px;padding:24px 20px;color:#fff;margin-bottom:20px;position:relative;overflow:hidden}
+.ih::before{content:'';position:absolute;right:-30px;bottom:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.07)}
+.iht{font-family:'Syne',sans-serif;font-size:21px;font-weight:700;margin-bottom:6px}
+.ihs{font-size:13px;opacity:.85;line-height:1.5}
+.ik{display:flex;gap:10px;margin-top:16px}
+.ikp{background:rgba(255,255,255,.15);border-radius:12px;padding:10px 14px;flex:1;text-align:center}
+.ikv{font-family:'Syne',sans-serif;font-size:17px;font-weight:700}
+.ikl{font-size:10px;opacity:.8;margin-top:1px}
+.il2{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.ic{background:var(--card);border:1px solid var(--br);border-radius:16px;padding:16px;display:flex;gap:14px;align-items:flex-start}
+.ii{width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.ict{font-size:14px;font-weight:600;color:var(--tx);margin-bottom:4px}
+.icb{font-size:12px;color:var(--mu);line-height:1.55}
+.itg{display:inline-block;font-size:10px;font-weight:600;border-radius:100px;padding:2px 8px;margin-top:6px}
+.tg{background:var(--tl-l);color:var(--tl)}
+.to{background:var(--sf-l);color:var(--sf-d)}
+.ti2{background:var(--in-l);color:var(--in)}
+.pm{background:var(--in);border-radius:18px;padding:20px;color:#fff;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pt h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px}
+.pt p{font-size:12px;opacity:.8;line-height:1.4}
+.pp{background:rgba(255,255,255,.18);border-radius:12px;padding:10px 14px;text-align:center;flex-shrink:0}
+.pp .pv{font-family:'Syne',sans-serif;font-size:20px;font-weight:800}
+.pp .pl{font-size:10px;opacity:.8}
+.upb{width:100%;padding:14px;background:var(--sf);color:#fff;border:none;border-radius:14px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:background .15s}
+.upb:hover{background:var(--sf-d)}
+
+/* modal */
+.mo{position:absolute;inset:0;background:rgba(0,0,0,.55);display:none;align-items:flex-end;z-index:200;backdrop-filter:blur(4px)}
+.mo.show{display:flex;animation:fi .2s ease}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.ms{background:var(--card);border-radius:28px 28px 0 0;padding:28px 20px 48px;width:100%}
+.mh{width:36px;height:4px;background:var(--br);border-radius:2px;margin:0 auto 22px}
+.mt2{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--tx);margin-bottom:6px}
+.ms2{font-size:13px;color:var(--mu);margin-bottom:20px}
+.mc{display:flex;flex-direction:column;gap:10px;margin-bottom:22px}
+.mr{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--tx)}
+.mi{width:22px;height:22px;border-radius:50%;background:var(--tl-l);display:flex;align-items:center;justify-content:center;color:var(--tl);font-size:11px;font-weight:700;flex-shrink:0}
+
+/* loading */
+.ld{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:14px}
+.sp2{width:36px;height:36px;border:3px solid var(--br);border-top-color:var(--sf);border-radius:50%;animation:sp 0.8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.ldt{font-size:14px;color:var(--mu);font-family:'Syne',sans-serif;font-weight:600}
+
+/* toast */
+.toast{position:absolute;top:60px;left:50%;transform:translateX(-50%);background:#1C1C1E;color:#fff;border-radius:100px;padding:10px 20px;font-size:13px;font-weight:500;white-space:nowrap;z-index:300;animation:toastIn .3s ease;pointer-events:none}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* OTP */
+.otp-wrap{display:flex;gap:10px;justify-content:center;margin:20px 0}
+.otp-box{width:52px;height:58px;border:1.5px solid var(--br);border-radius:14px;font-size:24px;font-weight:700;font-family:'Syne',sans-serif;text-align:center;background:var(--card);color:var(--tx);outline:none;transition:border-color .2s}
+.otp-box:focus{border-color:var(--sf)}
+</style>
+</head>
+<body>
+<div class="device" id="app">
+
+<!-- ══════════ S1: ONBOARDING ══════════ -->
+<div class="screen active" id="s1">
+  <div style="padding:52px 20px 0;text-align:center">
+    <div class="lp">
+      <div class="lm">C</div>
+      <div class="ln">CredUPI</div>
+    </div>
+    <div class="ht">Credit for every<br><em>shopkeeper</em></div>
+    <div class="hs">UPI-based loans without<br>collateral or paperwork</div>
+    <div class="ss">
+      <div class="sp"><div class="sv">₹75K</div><div class="sl">Avg Loan</div></div>
+      <div class="sp"><div class="sv">24 hrs</div><div class="sl">Approval</div></div>
+      <div class="sp"><div class="sv">Zero</div><div class="sl">Collateral</div></div>
+    </div>
+  </div>
+  <div style="padding:0 20px 40px">
+    <div style="margin-bottom:14px">
+      <label class="il">Your Name</label>
+      <input class="if" id="inp_name" type="text" placeholder="Raju Kumar"/>
+    </div>
+    <div style="margin-bottom:14px">
+      <label class="il">Mobile Number</label>
+      <input class="if" id="inp_phone" type="tel" placeholder="+91 98765 43210"/>
+    </div>
+    <div style="margin-bottom:18px">
+      <label class="il">Business Type</label>
+      <select class="if" id="inp_biz">
+        <option>Kirana / Grocery Store</option>
+        <option>Tea / Food Stall</option>
+        <option>Salon / Barber Shop</option>
+        <option>Repair Shop</option>
+        <option>Street Vendor</option>
+        <option>Medical / Pharmacy</option>
+      </select>
+    </div>
+    <button class="pb" onclick="doOTP()">Get My Credit Score →</button>
+    <div class="dv">already have an account</div>
+    <button class="sb2" onclick="quickLogin()">Log In</button>
+    <div class="tr">
+      <div class="tb"><div class="td"></div>RBI Compliant</div>
+      <div class="tb"><div class="td"></div>256-bit Secure</div>
+      <div class="tb"><div class="td"></div>Always Free</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ S1b: OTP ══════════ -->
+<div class="screen" id="s1b">
+  <div style="padding:60px 20px 0;text-align:center">
+    <div style="font-size:40px;margin-bottom:18px">📱</div>
+    <div class="ht" style="font-size:26px;margin-bottom:10px">Verify your<br>mobile number</div>
+    <div class="hs" id="otp_hint">OTP sent to +91 98765 43210</div>
+    <div class="otp-wrap">
+      <input class="otp-box" id="o1" maxlength="1" oninput="otpMove(this,'o2')"/>
+      <input class="otp-box" id="o2" maxlength="1" oninput="otpMove(this,'o3')"/>
+      <input class="otp-box" id="o3" maxlength="1" oninput="otpMove(this,'o4')"/>
+      <input class="otp-box" id="o4" maxlength="1" oninput="otpMove(this,null)"/>
+    </div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:24px">Hint: enter <b>1234</b> to continue (demo)</div>
+  </div>
+  <div style="padding:0 20px">
+    <button class="pb" onclick="verifyOTP()">Verify OTP →</button>
+    <button class="sb2" onclick="goTo('s1')" style="margin-top:12px">← Back</button>
+  </div>
+</div>
+
+<!-- ══════════ S2: CONNECT UPI ══════════ -->
+<div class="screen" id="s2">
+  <div class="sb"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="nb">
+    <div class="bk" onclick="goTo('s1b')">←</div>
+    <div class="nt">Connect UPI</div>
+    <div style="width:36px"></div>
+  </div>
+  <div class="ct">
+    <div class="ch">
+      <div class="cht">Link your UPI account</div>
+      <div class="chs">We analyse 90 days of transaction history to calculate your CredUPI Score. Read-only — we never move money.</div>
+      <div class="cbg">🔒 Bank-grade encryption · RBI approved</div>
+    </div>
+    <div class="sec">Choose your UPI app</div>
+    <div class="ug">
+      <div class="uc" onclick="selUPI(this)"><div class="ui" style="background:#E8F5E9">📱</div><div><div class="un">PhonePe</div><div class="uu">50 Cr+ users</div></div></div>
+      <div class="uc sel" onclick="selUPI(this)"><div class="ui" style="background:#E3F2FD">💳</div><div><div class="un">Google Pay</div><div class="uu">67 Cr+ users</div></div></div>
+      <div class="uc" onclick="selUPI(this)"><div class="ui" style="background:#FFF3E0">🏦</div><div><div class="un">Paytm</div><div class="uu">33 Cr+ users</div></div></div>
+      <div class="uc" onclick="selUPI(this)"><div class="ui" style="background:#F3E5F5">🔵</div><div><div class="un">BHIM UPI</div><div class="uu">10 Cr+ users</div></div></div>
+    </div>
+    <div class="pb2">
+      <div class="pb2t">What we access (read-only)</div>
+      <div class="pr"><div class="pc">✓</div>Transaction amounts &amp; dates</div>
+      <div class="pr"><div class="pc">✓</div>Payment frequency &amp; patterns</div>
+      <div class="pr"><div class="pc">✓</div>Business income consistency</div>
+      <div class="pr" style="opacity:.5"><div class="px">✗</div>No contacts, messages or personal data</div>
+    </div>
+    <button class="pb" onclick="doAnalyse()">Authorise &amp; Analyse →</button>
+  </div>
+</div>
+
+<!-- ══════════ S3: DASHBOARD ══════════ -->
+<div class="screen" id="s3">
+  <div class="sb"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="nb">
+    <div style="display:flex;flex-direction:column"><span style="font-size:10px;color:var(--mu);font-weight:500">Namaste 👋</span><span id="d_name" style="font-size:14px;font-weight:600;color:var(--tx)">Raju Kumar</span></div>
+    <div class="nt" style="font-size:14px">Dashboard</div>
+    <div class="av" id="d_av">RK</div>
+  </div>
+  <div class="ct">
+    <div class="sh" onclick="goTo('s4')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px">
+        <div class="shl">CredUPI Score</div><div style="font-size:16px;opacity:.7">→</div>
+      </div>
+      <div class="sn" id="d_score">—</div>
+      <div class="stg" id="d_stag">Calculating...</div>
+      <div class="sbb"><div class="sbf" id="d_bar" style="width:0%"></div></div>
+      <div class="sr"><span>300 Poor</span><span>900 Excellent</span></div>
+    </div>
+    <div class="sec">This month</div>
+    <div class="sg">
+      <div class="sc"><div class="scl">UPI Income</div><div class="scv" id="d_income">—</div><div class="scc" id="d_income_ch">Computing...</div></div>
+      <div class="sc"><div class="scl">Transactions</div><div class="scv" id="d_txcount">—</div><div class="scc" id="d_txch">Computing...</div></div>
+      <div class="sc"><div class="scl">Avg Daily</div><div class="scv" id="d_daily">—</div><div class="scc">Stable stream</div></div>
+      <div class="sc"><div class="scl">Loan Eligible</div><div class="scv" id="d_elig" style="color:var(--sf)">—</div><div class="scc lk" onclick="goTo('s5')">View offers →</div></div>
+    </div>
+    <div class="cc">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+        <div class="sec" style="margin-bottom:0">Weekly income</div>
+        <div style="font-size:11px;color:var(--mu)">₹ thousands</div>
+      </div>
+      <div id="barC" style="display:flex;align-items:flex-end;gap:6px;height:64px;margin-top:12px;margin-bottom:6px"></div>
+      <div id="barL" style="display:flex;gap:6px"></div>
+    </div>
+    <div class="tsh"><div class="sec" style="margin-bottom:0">Recent transactions</div><div class="ta">See all</div></div>
+    <div class="tl" id="txList"></div>
+  </div>
+  <div class="bn">
+    <div class="ni on" onclick="goTo('s3')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></div>
+    <div class="ni" onclick="goTo('s4')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>Score</span></div>
+    <div class="ni" onclick="goTo('s5')"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span>Loans</span></div>
+    <div class="ni" onclick="goTo('s6')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Insights</span></div>
+  </div>
+</div>
+
+<!-- ══════════ S4: SCORE ══════════ -->
+<div class="screen" id="s4">
+  <div class="sb"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="nb">
+    <div class="bk" onclick="goTo('s3')">←</div>
+    <div class="nt">CredUPI Score</div>
+    <div style="width:36px"></div>
+  </div>
+  <div class="ct">
+    <div class="gc">
+      <div class="gw">
+        <svg viewBox="0 0 200 100" style="width:100%;height:100%">
+          <defs><linearGradient id="gg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#FF6B2B"/><stop offset="100%" style="stop-color:#F9A825"/></linearGradient></defs>
+          <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#E2DDD5" stroke-width="12" stroke-linecap="round"/>
+          <path id="gaugePath" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#gg)" stroke-width="12" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="251" style="transition:stroke-dashoffset 1.2s ease"/>
+        </svg>
+        <div class="gt" id="sc_score">—</div>
+      </div>
+      <div class="sk" id="sc_tag">ANALYSING</div>
+      <div class="sb3" id="sc_basis">Based on your UPI transaction history</div>
+    </div>
+    <div class="sec">Score breakdown</div>
+    <div class="fl" id="factorList">
+      <div class="ld"><div class="sp2"></div><div class="ldt">Calculating factors...</div></div>
+    </div>
+    <button class="ab bt" onclick="goTo('s5')">🏦 View Loan Offers</button>
+    <button class="ab bi" id="dlBtn" onclick="showToast('📄 Report downloaded!')">📄 Download Financial Report</button>
+  </div>
+  <div class="bn">
+    <div class="ni" onclick="goTo('s3')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></div>
+    <div class="ni on" onclick="goTo('s4')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>Score</span></div>
+    <div class="ni" onclick="goTo('s5')"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span>Loans</span></div>
+    <div class="ni" onclick="goTo('s6')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Insights</span></div>
+  </div>
+</div>
+
+<!-- ══════════ S5: LOANS ══════════ -->
+<div class="screen" id="s5">
+  <div class="sb"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="nb">
+    <div class="bk" onclick="goTo('s4')">←</div>
+    <div class="nt">Loan Offers</div>
+    <div style="width:36px"></div>
+  </div>
+  <div class="ct">
+    <div class="lh">
+      <div class="ll">Maximum eligible amount</div>
+      <div class="la" id="l_max">—</div>
+      <div class="ls" id="l_sub">Based on your CredUPI Score</div>
+      <div class="lb" style="position:relative;z-index:1"><div class="lbv" id="l_cnt">—</div><div class="lbl">Offers</div></div>
+    </div>
+    <div class="ec">
+      <div class="el">Estimated monthly EMI</div>
+      <div class="ev" id="l_emi">Calculating...</div>
+      <div class="es" id="l_emi_sub">Based on best offer</div>
+    </div>
+    <div class="sec">Available offers</div>
+    <div class="ol" id="offerList">
+      <div class="ld"><div class="sp2"></div><div class="ldt">Matching lenders...</div></div>
+    </div>
+  </div>
+  <div class="bn">
+    <div class="ni" onclick="goTo('s3')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></div>
+    <div class="ni" onclick="goTo('s4')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>Score</span></div>
+    <div class="ni on" onclick="goTo('s5')"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span>Loans</span></div>
+    <div class="ni" onclick="goTo('s6')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Insights</span></div>
+  </div>
+
+  <!-- Apply Modal -->
+  <div class="mo" id="applyMo" onclick="closeApply(event)">
+    <div class="ms">
+      <div class="mh"></div>
+      <div class="mt2" id="mo_title">Apply Now</div>
+      <div class="ms2" id="mo_sub">No collateral required</div>
+      <div class="mc">
+        <div class="mr"><div class="mi">✓</div>Aadhaar eKYC — takes 2 min</div>
+        <div class="mr"><div class="mi">✓</div>UPI history auto-attached</div>
+        <div class="mr"><div class="mi">✓</div>No physical documents needed</div>
+        <div class="mr"><div class="mi">✓</div>Disbursed within 24 hours</div>
+      </div>
+      <button class="pb" onclick="submitApply()">Confirm &amp; Submit Application →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ S6: INSIGHTS ══════════ -->
+<div class="screen" id="s6">
+  <div class="sb"><span>9:41</span><span>●●● 100%</span></div>
+  <div class="nb">
+    <div class="bk" onclick="goTo('s3')">←</div>
+    <div class="nt">Business Insights</div>
+    <div style="width:36px"></div>
+  </div>
+  <div class="ct">
+    <div class="ih">
+      <div class="iht" id="ins_hero_t">Analysing your business...</div>
+      <div class="ihs" id="ins_hero_s">AI is reviewing your transaction patterns.</div>
+      <div class="ik">
+        <div class="ikp"><div class="ikv" id="ins_k1">—</div><div class="ikl">Income growth</div></div>
+        <div class="ikp"><div class="ikv" id="ins_k2">—</div><div class="ikl">Transactions</div></div>
+        <div class="ikp"><div class="ikv" id="ins_k3">—</div><div class="ikl">CredUPI Score</div></div>
+      </div>
+    </div>
+    <div class="sec">AI-powered insights</div>
+    <div class="il2" id="insightList">
+      <div class="ld"><div class="sp2"></div><div class="ldt">Generating insights...</div></div>
+    </div>
+    <div class="pm">
+      <div class="pt"><h3>Upgrade to Premium</h3><p>Loan predictor · GST-ready reports · Advanced analytics</p></div>
+      <div class="pp"><div class="pv">₹199</div><div class="pl">/month</div></div>
+    </div>
+    <button class="upb" onclick="showToast('🎉 Premium coming soon!')">Unlock Premium Features →</button>
+  </div>
+  <div class="bn">
+    <div class="ni" onclick="goTo('s3')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></div>
+    <div class="ni" onclick="goTo('s4')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>Score</span></div>
+    <div class="ni" onclick="goTo('s5')"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span>Loans</span></div>
+    <div class="ni on" onclick="goTo('s6')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Insights</span></div>
+  </div>
+</div>
+
+</div><!-- /device -->
+
+<script>
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+const state = {
+  name:'', phone:'', biz:'',
+  score:0, scoreTag:'', scoreBasis:'',
+  factors:[],
+  txns:[], weeklyData:[],
+  totalIncome:0, txCount:0, avgDaily:0, loanEligible:0,
+  offers:[],
+  insights:[], insightHero:{title:'',sub:''},
+  incomeChange:0
+};
+
+// ═══════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const s=document.getElementById(id);
+  s.classList.add('active');
+  if(s.querySelector('.ct')) s.querySelector('.ct').scrollTop=0;
+}
+
+// ═══════════════════════════════════════════
+//  OTP FLOW
+// ═══════════════════════════════════════════
+function doOTP(){
+  const name=document.getElementById('inp_name').value.trim();
+  const phone=document.getElementById('inp_phone').value.trim();
+  const biz=document.getElementById('inp_biz').value;
+  if(!name){showToast('Please enter your name');return;}
+  if(!phone){showToast('Please enter mobile number');return;}
+  state.name=name; state.phone=phone; state.biz=biz;
+  document.getElementById('otp_hint').textContent='OTP sent to '+phone+' (demo: use 1234)';
+  goTo('s1b');
+  setTimeout(()=>document.getElementById('o1').focus(),300);
+}
+function quickLogin(){
+  state.name='Raju Kumar'; state.phone='+91 98765 43210'; state.biz='Kirana / Grocery Store';
+  document.getElementById('o1').value='1';document.getElementById('o2').value='2';
+  document.getElementById('o3').value='3';document.getElementById('o4').value='4';
+  goTo('s1b');
+  setTimeout(verifyOTP,400);
+}
+function otpMove(el,nextId){
+  if(el.value.length===1&&nextId) document.getElementById(nextId).focus();
+  const all=[1,2,3,4].map(i=>document.getElementById('o'+i).value).join('');
+  if(all.length===4) setTimeout(verifyOTP,300);
+}
+function verifyOTP(){
+  const otp=[1,2,3,4].map(i=>document.getElementById('o'+i).value).join('');
+  if(otp==='1234'){
+    goTo('s2');
+  } else {
+    showToast('Invalid OTP — use 1234');
+    [1,2,3,4].forEach(i=>document.getElementById('o'+i).value='');
+    document.getElementById('o1').focus();
+  }
+}
+
+// ═══════════════════════════════════════════
+//  UPI SELECTION
+// ═══════════════════════════════════════════
+function selUPI(el){
+  document.querySelectorAll('.uc').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+// ═══════════════════════════════════════════
+//  TRANSACTION GENERATOR
+//  Generates realistic UPI data based on business type
+// ═══════════════════════════════════════════
+function generateTransactions(biz){
+  const configs = {
+    'Kirana / Grocery Store':   {min:800, max:3500, txPerDay:25, label:'Customer Payment', icon:'🛒', bg:'#E8F5E9'},
+    'Tea / Food Stall':         {min:200, max:1200, txPerDay:40, label:'Customer Payment', icon:'🍵', bg:'#FFF3E0'},
+    'Salon / Barber Shop':      {min:150, max:800,  txPerDay:12, label:'Service Payment',  icon:'✂️', bg:'#F3E5F5'},
+    'Repair Shop':              {min:300, max:2500, txPerDay:8,  label:'Repair Payment',   icon:'🔧', bg:'#E8EAF6'},
+    'Street Vendor':            {min:100, max:600,  txPerDay:35, label:'Customer Payment', icon:'🛍️', bg:'#E0F2F1'},
+    'Medical / Pharmacy':       {min:500, max:4000, txPerDay:20, label:'Medicine Sale',    icon:'💊', bg:'#FFEBEE'},
+  };
+  const cfg = configs[biz] || configs['Kirana / Grocery Store'];
+  const txns = [];
+  const weekly = [];
+  const now = new Date();
+  for(let w=7;w>=0;w--){
+    let wTotal=0;
+    const days = w===0?3:7;
+    for(let d=0;d<days;d++){
+      const date = new Date(now);
+      date.setDate(date.getDate() - (w*7+d));
+      const dayTx = Math.floor(cfg.txPerDay * (0.6+Math.random()*0.8));
+      // Sunday dip
+      if(date.getDay()===0){ continue; }
+      for(let t=0;t<dayTx;t++){
+        const amt = Math.floor(cfg.min + Math.random()*(cfg.max-cfg.min));
+        wTotal+=amt;
+        txns.push({
+          name: cfg.label,
+          icon: cfg.icon,
+          bg: cfg.bg,
+          amount: amt,
+          date: date,
+          type: 'cr'
+        });
+      }
+      // Expense: wholesale/supply ~2x per week
+      if(Math.random()<0.28){
+        const exp = Math.floor(wTotal*0.15);
+        txns.push({name:'Wholesale Supply', icon:'📦', bg:'#FFEBEE', amount:exp, date:date, type:'dr'});
+      }
+    }
+    weekly.push(Math.round(wTotal/1000));
+  }
+  txns.sort((a,b)=>b.date-a.date);
+  return {txns:txns.slice(0,40), weekly};
+}
+
+// ═══════════════════════════════════════════
+//  ANALYSE → AI CREDIT SCORE (Claude API)
+// ═══════════════════════════════════════════
+async function doAnalyse(){
+  const btn = event.currentTarget;
+  btn.disabled=true; btn.textContent='Analysing transactions...';
+
+  // Generate realistic transaction data
+  const {txns, weekly} = generateTransactions(state.biz);
+  state.txns = txns;
+  state.weeklyData = weekly;
+
+  // Calculate raw stats
+  const crTxns = txns.filter(t=>t.type==='cr');
+  state.totalIncome = crTxns.reduce((s,t)=>s+t.amount,0);
+  state.txCount = crTxns.length;
+  state.avgDaily = Math.round(state.totalIncome/55);
+  state.incomeChange = Math.round(8+Math.random()*15);
+
+  // Build summary for AI
+  const summary = {
+    businessType: state.biz,
+    totalTransactions: txns.length,
+    creditTransactions: crTxns.length,
+    totalIncome: state.totalIncome,
+    avgDailyIncome: state.avgDaily,
+    weeklyPattern: weekly,
+    hasSundayDip: true,
+    businessName: state.name,
+    months: 3
+  };
+
+  try {
+    const result = await callClaude(`
+You are CredUPI, an AI credit scoring engine for small Indian shopkeepers.
+
+Analyse this UPI transaction data and return ONLY valid JSON (no markdown, no explanation):
+
+Business: ${summary.businessType}
+Owner: ${summary.businessName}
+Total credit transactions (90 days): ${summary.creditTransactions}
+Total income (90 days): ₹${summary.totalIncome.toLocaleString('en-IN')}
+Average daily income: ₹${summary.avgDaily.toLocaleString('en-IN')}
+Weekly income pattern (₹K): ${JSON.stringify(summary.weeklyPattern)}
+
+Return this exact JSON shape:
+{
+  "score": <integer 300-900>,
+  "tag": <"Poor"|"Fair"|"Good"|"Very Good"|"Excellent">,
+  "basis": <one sentence about what drove this score>,
+  "factors": [
+    {"name": "Income Consistency", "score": <0-100>, "color": "#00897B"},
+    {"name": "Transaction Volume",  "score": <0-100>, "color": "#FF6B2B"},
+    {"name": "Business Stability",  "score": <0-100>, "color": "#5C6BC0"},
+    {"name": "Payment Regularity",  "score": <0-100>, "color": "#F9A825"},
+    {"name": "Growth Trend",        "score": <0-100>, "color": "#4DB6AC"}
+  ],
+  "loanEligible": <integer in INR, realistic for this income>,
+  "offers": [
+    {"lender":"<name>","type":"<Bank|NBFC|P2P>","amount":<int>,"rate":<float>,"tenureMonths":<int>,"icon":"🏦","featured":true},
+    {"lender":"<name>","type":"<type>","amount":<int>,"rate":<float>,"tenureMonths":<int>,"icon":"🏢","featured":false},
+    {"lender":"<name>","type":"<type>","amount":<int>,"rate":<float>,"tenureMonths":<int>,"icon":"💼","featured":false}
+  ],
+  "insights": [
+    {"title":"<title>","body":"<2 sentences specific to this business and data>","icon":"📈","bg":"#E0F2F1","tag":"Opportunity","tagClass":"tg"},
+    {"title":"<title>","body":"<2 sentences>","icon":"⚠️","bg":"#FFF0E8","tag":"Action needed","tagClass":"to"},
+    {"title":"<title>","body":"<2 sentences about how to improve score>","icon":"🎯","bg":"#E8EAF6","tag":"Score tip","tagClass":"ti2"},
+    {"title":"<title>","body":"<seasonal or trend insight>","icon":"💰","bg":"#FFF8E1","tag":"Trend","tagClass":"tg"}
+  ],
+  "insightHero": {
+    "title": "<encouraging headline about the business>",
+    "sub": "<one line with a specific stat and what it means>"
+  }
+}
+`, 1200);
+
+    let data;
+    try { data = JSON.parse(result); }
+    catch(e){ data = JSON.parse(result.replace(/```json|```/g,'')); }
+
+    state.score = data.score;
+    state.scoreTag = data.tag;
+    state.scoreBasis = data.basis;
+    state.factors = data.factors;
+    state.loanEligible = data.loanEligible;
+    state.offers = data.offers;
+    state.insights = data.insights;
+    state.insightHero = data.insightHero;
+
+    renderDashboard();
+    renderScore();
+    renderLoans();
+    renderInsights();
+
+    btn.disabled=false; btn.innerHTML='Authorise &amp; Analyse →';
+    goTo('s3');
+    showToast('✅ Analysis complete!');
+  } catch(err){
+    console.error(err);
+    // Fallback if API unavailable
+    fallbackAnalyse();
+    btn.disabled=false; btn.innerHTML='Authorise &amp; Analyse →';
+    goTo('s3');
+    showToast('📊 Score calculated!');
+  }
+}
+
+function fallbackAnalyse(){
+  const base = state.avgDaily;
+  const s = Math.min(900, Math.max(550, Math.round(600 + (base/100))));
+  state.score=s; state.scoreTag=s>750?'Very Good':s>650?'Good':'Fair';
+  state.scoreBasis='Based on consistent daily UPI income and high transaction frequency.';
+  state.factors=[
+    {name:'Income Consistency',score:88,color:'#00897B'},
+    {name:'Transaction Volume', score:75,color:'#FF6B2B'},
+    {name:'Business Stability', score:82,color:'#5C6BC0'},
+    {name:'Payment Regularity', score:70,color:'#F9A825'},
+    {name:'Growth Trend',       score:72,color:'#4DB6AC'},
+  ];
+  state.loanEligible = Math.round(state.avgDaily*25/1000)*1000;
+  state.offers=[
+    {lender:'Fincare Small Finance Bank',type:'Bank',amount:state.loanEligible,rate:14.5,tenureMonths:12,icon:'🏦',featured:true},
+    {lender:'Aroha Microfinance',type:'NBFC',amount:Math.round(state.loanEligible*.7/1000)*1000,rate:18,tenureMonths:6,icon:'🏢',featured:false},
+    {lender:'Rang De P2P',type:'P2P',amount:Math.round(state.loanEligible*.4/1000)*1000,rate:12,tenureMonths:3,icon:'💼',featured:false},
+  ];
+  state.insights=[
+    {title:'Peak hour revenue pattern',body:'Your busiest hours generate 40% of daily income. Staff up during this window to capture more sales.',icon:'📈',bg:'#E0F2F1',tag:'Opportunity',tagClass:'tg'},
+    {title:'Sunday income gap detected',body:'Transactions drop significantly on Sundays. A weekly promotion could fill this gap and improve regularity score.',icon:'⚠️',bg:'#FFF0E8',tag:'Action needed',tagClass:'to'},
+    {title:'Score improvement tip',body:'Two more months of consistent income will push your score above 780, unlocking lower interest rates.',icon:'🎯',bg:'#E8EAF6',tag:'Score tip',tagClass:'ti2'},
+    {title:'Seasonal opportunity ahead',body:'Festival season typically brings 15–20% revenue spikes. Consider stocking up inventory now.',icon:'💰',bg:'#FFF8E1',tag:'Trend',tagClass:'tg'},
+  ];
+  state.insightHero={title:'Your business shows strong growth!',sub:`₹${state.totalIncome.toLocaleString('en-IN')} earned in 90 days with ${state.txCount} transactions.`};
+  renderDashboard(); renderScore(); renderLoans(); renderInsights();
+}
+
+// ═══════════════════════════════════════════
+//  RENDER FUNCTIONS
+// ═══════════════════════════════════════════
+function renderDashboard(){
+  const initials = state.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('d_name').textContent = state.name;
+  document.getElementById('d_av').textContent = initials;
+  document.getElementById('d_score').textContent = state.score;
+  document.getElementById('d_stag').textContent = state.scoreTag+' · Tap for full report';
+  const pct = Math.round((state.score-300)/600*100);
+  document.getElementById('d_bar').style.width = pct+'%';
+  document.getElementById('d_income').textContent = '₹'+state.totalIncome.toLocaleString('en-IN');
+  document.getElementById('d_income_ch').textContent = '▲ '+state.incomeChange+'% vs last month';
+  document.getElementById('d_txcount').textContent = state.txCount;
+  document.getElementById('d_txch').textContent = '▲ 8% vs last month';
+  document.getElementById('d_daily').textContent = '₹'+state.avgDaily.toLocaleString('en-IN');
+  document.getElementById('d_elig').textContent = '₹'+state.loanEligible.toLocaleString('en-IN');
+
+  // Bar chart
+  const bc=document.getElementById('barC'), bl=document.getElementById('barL');
+  bc.innerHTML=''; bl.innerHTML='';
+  const wkl=['W1','W2','W3','W4','W5','W6','W7','Now'];
+  const mx=Math.max(...state.weeklyData);
+  state.weeklyData.forEach((v,i)=>{
+    const bar=document.createElement('div');
+    bar.style.cssText=`flex:1;border-radius:4px 4px 0 0;height:${Math.round((v/mx)*58)+4}px;background:${i===state.weeklyData.length-1?'var(--sf)':'var(--sf-m)'};min-height:4px`;
+    bc.appendChild(bar);
+    const l=document.createElement('div');
+    l.style.cssText='flex:1;text-align:center;font-size:9px;color:var(--mu);margin-top:4px';
+    l.textContent=wkl[i]; bl.appendChild(l);
+  });
+
+  // Transactions
+  const tl=document.getElementById('txList'); tl.innerHTML='';
+  const fmtDate=d=>{
+    const now=new Date(),diff=Math.floor((now-d)/86400000);
+    const t=d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    if(diff===0) return 'Today · '+t;
+    if(diff===1) return 'Yesterday · '+t;
+    return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+' · '+t;
+  };
+  state.txns.slice(0,5).forEach(tx=>{
+    const d=document.createElement('div'); d.className='ti';
+    d.innerHTML=`<div class="tix"><div class="tav" style="background:${tx.bg}">${tx.icon}</div><div><div class="tnm">${tx.name}</div><div class="ttm">${fmtDate(tx.date)}</div></div></div><div class="tam ${tx.type}">${tx.type==='cr'?'+':'-'}₹${tx.amount.toLocaleString('en-IN')}</div>`;
+    tl.appendChild(d);
+  });
+}
+
+function renderScore(){
+  document.getElementById('sc_score').textContent = state.score;
+  document.getElementById('sc_tag').textContent = '✦ '+state.scoreTag.toUpperCase();
+  document.getElementById('sc_basis').textContent = state.scoreBasis;
+  // Gauge
+  const pct=(state.score-300)/600;
+  const offset=Math.round(251-(251*pct));
+  document.getElementById('gaugePath').style.strokeDashoffset=offset;
+  // Factors
+  const fl=document.getElementById('factorList'); fl.innerHTML='';
+  state.factors.forEach(f=>{
+    const d=document.createElement('div'); d.className='fc';
+    d.innerHTML=`<div class="ft"><span class="fn">${f.name}</span><span class="fs">${f.score}/100</span></div><div class="fb"><div class="ff" style="width:${f.score}%;background:${f.color}"></div></div>`;
+    fl.appendChild(d);
+  });
+}
+
+function renderLoans(){
+  if(!state.offers||!state.offers.length) return;
+  const best=state.offers[0];
+  document.getElementById('l_max').textContent='₹'+state.loanEligible.toLocaleString('en-IN');
+  document.getElementById('l_sub').textContent='Based on CredUPI Score '+state.score+' · '+state.offers.length+' offers';
+  document.getElementById('l_cnt').textContent=state.offers.length;
+  // EMI calc: P*r*(1+r)^n / ((1+r)^n - 1)
+  const P=best.amount, r=best.rate/100/12, n=best.tenureMonths;
+  const emi=Math.round(P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1));
+  document.getElementById('l_emi').textContent='₹'+emi.toLocaleString('en-IN')+' / month';
+  document.getElementById('l_emi_sub').textContent=`For ₹${best.amount.toLocaleString('en-IN')} at ${best.rate}% for ${best.tenureMonths} months`;
+
+  const ol=document.getElementById('offerList'); ol.innerHTML='';
+  state.offers.forEach(o=>{
+    const P2=o.amount,r2=o.rate/100/12,n2=o.tenureMonths;
+    const emi2=Math.round(P2*r2*Math.pow(1+r2,n2)/(Math.pow(1+r2,n2)-1));
+    const d=document.createElement('div');
+    d.className='oc'+(o.featured?' ft2':'');
+    d.innerHTML=`
+      ${o.featured?'<div class="ftg">Best Match</div>':''}
+      <div class="oh"><div class="og">${o.icon}</div><div><div class="on2">${o.lender}</div><div class="ot">${o.type} · RBI Regulated</div></div></div>
+      <div class="os">
+        <div class="ost"><div class="ostl">Amount</div><div class="ostv">₹${(o.amount/1000).toFixed(0)}K</div></div>
+        <div class="ost"><div class="ostl">Interest</div><div class="ostv">${o.rate}%</div></div>
+        <div class="ost"><div class="ostl">Tenure</div><div class="ostv">${o.tenureMonths} mo</div></div>
+      </div>
+      <button class="apb ${o.featured?'og2':'id'}" onclick="showApply('${o.lender}','₹${o.amount.toLocaleString('en-IN')}','${o.rate}% for ${o.tenureMonths} months','₹${emi2.toLocaleString('en-IN')}/mo')">
+        Apply Now${o.featured?' · No collateral needed':''}
+      </button>`;
+    ol.appendChild(d);
+  });
+}
+
+function renderInsights(){
+  document.getElementById('ins_hero_t').textContent = state.insightHero.title;
+  document.getElementById('ins_hero_s').textContent = state.insightHero.sub;
+  document.getElementById('ins_k1').textContent = '↑'+state.incomeChange+'%';
+  document.getElementById('ins_k2').textContent = state.txCount;
+  document.getElementById('ins_k3').textContent = state.score;
+
+  const il=document.getElementById('insightList'); il.innerHTML='';
+  state.insights.forEach(ins=>{
+    const d=document.createElement('div'); d.className='ic';
+    d.innerHTML=`<div class="ii" style="background:${ins.bg}">${ins.icon}</div><div><div class="ict">${ins.title}</div><div class="icb">${ins.body}</div><div class="itg ${ins.tagClass}">${ins.tag}</div></div>`;
+    il.appendChild(d);
+  });
+}
+
+// ═══════════════════════════════════════════
+//  LOAN APPLY MODAL
+// ═══════════════════════════════════════════
+function showApply(lender,amount,terms,emi){
+  document.getElementById('mo_title').textContent='Apply with '+lender;
+  document.getElementById('mo_sub').textContent=amount+' at '+terms+' · EMI '+emi+' · No collateral';
+  document.getElementById('applyMo').classList.add('show');
+}
+function closeApply(e){
+  if(!e||e.target===document.getElementById('applyMo')){
+    document.getElementById('applyMo').classList.remove('show');
+  }
+}
+function submitApply(){
+  document.getElementById('applyMo').classList.remove('show');
+  showToast('🎉 Application submitted! You\'ll hear back in 24 hrs.');
+}
+
+// ═══════════════════════════════════════════
+//  CLAUDE API CALL
+// ═══════════════════════════════════════════
+async function callClaude(prompt, maxTokens=1000){
+  const res = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens: maxTokens,
+      messages:[{role:'user',content:prompt}]
+    })
+  });
+  if(!res.ok) throw new Error('API error '+res.status);
+  const data = await res.json();
+  return data.content.map(b=>b.text||'').join('');
+}
+
+// ═══════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════
+function showToast(msg){
+  const t=document.createElement('div');
+  t.className='toast'; t.textContent=msg;
+  document.getElementById('app').appendChild(t);
+  setTimeout(()=>t.remove(),2800);
+}
+</script>
+</body>
+</html>
